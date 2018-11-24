@@ -41,8 +41,7 @@ class Particle:
 			# cognitive 
 			vPersonal = c1 * r1 * (self.pBestSelf[i] - self.position[i])
 			# social
-			vGroup = c2 * r2 * (gBestSelf[i] - self.position[i])
-			
+			vGroup = c2 * r2 * (gBestSelf[i] - self.position[i])			
 			# Vector sum and store to velocity
 			self.velocity[i] = self.velocity [i] + vPersonal + vGroup
 			
@@ -53,6 +52,8 @@ class Particle:
 		
 	def updatePosition (self):
 		for i in range (0, keyLen):
+			self.position[i] = self.position[i] + self.velocity[i]
+			if 
 			
 		#just add the velocity to the position in each dimension
 		
