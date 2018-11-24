@@ -27,28 +27,28 @@ class Particle:
 		# initialize a random position and random velocity
 		for i in range(0, self.keyLen):                  # iterate through the length of key.
 			self.position.append(random.random()*26)     # randomly initializing particle's position
-			self.velocity.append(random.uniform(0, 1))   # ranomly initializing particle's	 
+			self.velocity.append(random.uniform(0, 1))   # ranomly initializing particle's	velocity 
 		
 		
 	def updateVelocity (self, gBestPos, gBestErr):
 		c1 = 2.05    # self confidence
-		c2 = 2.05    # swam confidence
+		c2 = 2.05    # swarm confidence
 		w = 0.9      # inertia
 		for i in range(0, keyLen):
 			r1 = random.random()
 			r2 = random.random()
 			
+			# cognitive 
 			vPersonal = c1 * r1 * (self.pBestSelf[i] - self.position[i])
+			# social
 			vGroup = c2 * r2 * (gBestSelf[i] - self.position[i])
 			
 			# Vector sum and store to velocity
-			self.velocity [i] = self.velocity [i] + vPersonal + vGroup
+			self.velocity[i] = self.velocity [i] + vPersonal + vGroup
 			
 		#inertia * current Velocity  = vel1
-		# calculate cognitive velocity
-		
-		# calculate social velocity
-		
+		# calculate cognitive velocity		
+		# calculate social velocity		
 		#resulting velocity = vector sum of all 3 of the above
 		
 	def updatePosition (self):
@@ -57,6 +57,8 @@ class Particle:
 		#just add the velocity to the position in each dimension
 		
 	def calcError (self, fitnessFunc):
+		for i in range (0, keyLen):
+			
 		#implement this by yourself
 		# remember that this must update the currError thingy, and the bestError (for self)
 
@@ -73,15 +75,15 @@ class PSO:
 		
 	def runPSO():
 		for i in range(0, len(maxIter)):
-			calcError() for each particle
+			#calcError() for each particle
 			
-			find the best error globally
+			#find the best error globally
 			
-			update velocity based on global and personal errors
+			#update velocity based on global and personal errors
 			
-			update position based on velocity
+			#update position based on velocity
 			
-			repeat
+			#repeat
 			
 			
 
