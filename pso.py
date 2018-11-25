@@ -1,19 +1,69 @@
 import math
 import random
+import string 
 
-'''
-Frequencies of English characters:
-A :  8.55        K :  0.81        U :  2.68
-B :  1.60        L :  4.21        V :  1.06
-C :  3.16        M :  2.53        W :  1.83
-D :  3.87        N :  7.17        X :  0.19
-E : 12.10        O :  7.47        Y :  1.72
-F :  2.18        P :  2.07        Z :  0.11
-G :  2.09        Q :  0.10                 
-H :  4.96        R :  6.33                 
-I :  7.33        S :  6.73                 
-J :  0.22        T :  8.94     
-'''
+# NOTE: currentPosition is a potential key currentPosition[0] = 'K' currentPosition[1] = 'E' currentPosition[2] = 'Y'.
+# TODO: Decrypt the encrypted text using the potential key.
+# TODO: Then perform fitness test on the decrypted text.
+
+
+def decrypt(encrypted, positionArr):
+	alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+	    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+	key = ""
+	# print(int(positionArr[0]), int(positionArr[1]),int(positionArr[2]), "
+	# ", end="")
+	for i in range(0, len(positionArr)):
+		key = key + alphabet[int(positionArr[i])]
+		# print(alphabet[int(positionArr[i])], end="")
+	# print(string)
+	#print(key, "----")
+
+	## Decryption...
+	cipher = []
+	i = 0
+	for c in encrypted:
+		if c in string.ascii_uppercase:
+			pos_c = ord(c) - ord('A')
+			pos_k = ord(key[i]) - ord('A')
+			cipher.append(chr((pos_c - pos_k) % 26 + ord('A')))
+			i = (i+1) % len(key)
+		else:
+			cipher.append(c)
+	decrypted = ''.join(cipher)
+	#print(decrypted, "\n")
+	return decrypted
+
+def fitnessFunc(currentPosition):
+
+	# print("currentPosition---------- ", currentPosition)
+	stdFreq = {'A': 8.55, 'B': 1.60, 'C': 3.16, 'D': 3.87, 'E':12.10, 'F': 2.18, 'G': 2.09, 'H': 4.96, 'I': 7.33, 'J': 0.22,
+	'K': 0.81, 'L': 4.21, 'M': 2.53, 'N': 7.17, 'O': 7.47, 'P': 2.07, 'Q': 0.10, 'U': 2.68, 'R': 6.33, 'S': 6.73,'T': 8.94, 
+	'V': 1.06, 'W': 1.83, 'X': 0.19, 'Y': 1.72, 'Z': 0.11}
+	
+	encryText = "KQGMVMGETOMQKOGDGFORYZTJSELMIRRERMSMUWDYSBLCFOERSREWMABSUKZCCEPOZCBCNYTSVEPDSBKCYXHYBIDYYLNMLKPKYWRO"
+	
+	decryText = decrypt(encryText, currentPosition)
+	#print(decryText)
+
+	obFreq = {}
+	for w in decryText:
+		obFreq[w] = decryText.count(w)
+	#print(decryText)
+	#print(currentPosition)
+	fitness = []
+	diff = 0
+	for w in stdFreq:
+		if w in obFreq:
+			diff = (diff + abs(stdFreq[w] - (obFreq[w]/len(decryText))))/100
+		else:
+			# if the character not in the key.
+			diff = (diff + abs(stdFreq[w] - 0 / len(decryText))) / 100
+			#print(w, " ", (obFreq[w]))	
+			
+	return diff
+
 class Particle:
 	
 	def __init__ (self):
@@ -29,28 +79,28 @@ class Particle:
 			self.velocity.append(random.uniform(0, 1))   # ranomly initializing particle's velocity 
 		
 		
-	def updateVelocity (self, gBestPos, gBestErr):
+	def updateVelocity (self, gBestPos):
 		c1 = 2.05    # self confidence
 		c2 = 2.05    # swarm confidence
 		w = 0.9      # inertia
-		for i in range(0, keyLen):
-			r1 = random.random()
-			r2 = random.random()
+		for i in range(0, self.keyLen):
+			r1 = random.uniform(0, 1)
+			r2 = random.uniform(0, 1)
 			
 			# cognitive 
 			vPersonal = c1 * r1 * (self.pBestSelf[i] - self.position[i])
 			# social
-			vGroup = c2 * r2 * (gBestSelf[i] - self.position[i])			
+			vGroup = c2 * r2 * (gBestPos[i] - self.position[i])			
 			# Vector sum and store to velocity
-			self.velocity[i] = self.velocity [i] + vPersonal + vGroup
+			self.velocity[i] = w * self.velocity[i] + vPersonal + vGroup
 			
-		#inertia * current Velocity  = vel1
+		# inertia * current Velocity  = vel1
 		# calculate cognitive velocity		
 		# calculate social velocity		
-		#resulting velocity = vector sum of all 3 of the above
+		# resulting velocity = vector sum of all 3 of the above
 		
 	def updatePosition (self, bounds):
-		for i in range (0, keyLen):
+		for i in range (0, self.keyLen):
 			self.position[i] = self.position[i] + self.velocity[i]
 			
 			if self.position[i] > bounds[i][1]:
@@ -60,29 +110,26 @@ class Particle:
 				self.position[i] = bounds[i][0]
 			
 			
-		#just add the velocity to the position in each dimension
+		# just add the velocity to the position in each dimension
 		
-	def calcError (self, fitnessFunc):
+	def calcError (self, func):
+		self.currError = func(self.position)
 		if self.currError < self.bestError or self.bestError == -1:
 			self.pBestSelf = self.position
 			self.bestError = self.currError
-		#implement this by yourself
+		# implement this by yourself
 		# remember that this must update the currError thingy, and the bestError (for self)
-
-		
 	
-	
-class PSO:
-	swarm = []
-	errorBestGlobal = -1
+class PSO():
 	
 	def __init__ (self, maxIter, numParticles, bounds, fitnessFunc):
-		#create a particle using the constructor n times based on numParticles
-		global dimensions
-		dimensions = 2    # 2-D dimensions right???
+		# create a particle using the constructor n times based on numParticles
+		    
 		bestErrorG = -1
 		bestPositionG = []
 		swarm = []
+		alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P','Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+		
 		
 		for i in range(0, numParticles):
 			p = Particle()
@@ -90,10 +137,13 @@ class PSO:
 		i = 0
 		while i < maxIter:
 			for j in range (0, numParticles):
+				print(i, " ", bestErrorG)
 				swarm[j].calcError(fitnessFunc)
+
+				#print("BestError: ", bestErrorG, " current Error: ", swarm[j].currError)
 				
-				if swarm[j].currError < bestErrorG or bestErrorG == -1:
-					pBestSelf = list(swarm[j].position)
+				if swarm[j].currError > bestErrorG or bestErrorG == -1:
+					bestPositionG = list(swarm[j].position)
 					bestErrorG = float(swarm[j].currError)
 			
 			for j in range(0, numParticles):
@@ -102,42 +152,14 @@ class PSO:
 			
 			i = i + 1
 			
-		print("Final")
-		print(bestPositionG)
-		print(bestErrorG)
-	'''def runPSO():
-		for i in range(0, len(maxIter)):
-			#calcError() for each particle
 			
-			#find the best error globally
-			
-			#update velocity based on global and personal errors
-			
-			#update position based on velocity
-			
-			#repeat
-	'''
+		for key in range (0, len(bestPositionG)):
+			print(alphabet[int(bestPositionG[key])] , end="")
+		print()
 
-def fitnessFunc():
-#input: currentPosition
-    stdFreq = {'A': 8.55, 'B': 1.60, 'C': 3.16, 'D': 3.87, 'E':12.10, 'F': 2.18, 'G': 2.09, 'H': 4.96, 'I': 7.33, 'J': 0.22,
-                'K': 0.81, 'L': 4.21, 'M': 2.53, 'N': 7.17, 'O': 7.47, 'P': 2.07, 'Q': 0.10, 'U': 2.68, 'R': 6.33, 'S': 6.73,
-                'T': 8.94, 'V': 1.06, 'W': 1.83, 'X': 0.19, 'Y': 1.72, 'Z': 0.11}
-	
-    decryText = "KMMABSUKZCSSEIIDCLCXENZPIYXGCDLYDGOMUWDOYHZILEYDMLGWMCPYAYFIQABITOVWZSNELEPDOHYIENBKVCPSSNNMLKPMMCXE"
-    obFreq = {}
-    for w in decryText:
-        obFreq[w] = decryText.count(w)
-    
-    fitness = []
-    diff = 0
 
-    for w in stdFreq:
-        if w in obFreq:
-            diff = abs(diff + stdFreq[w] - (obFreq[w]/len(decryText)))
-    print(diff)
-
-fitnessFunc()
+bounds = [(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25)]
+PSO(100, 100, bounds, fitnessFunc) 
 
 
 	
