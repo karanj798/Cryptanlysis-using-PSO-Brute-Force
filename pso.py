@@ -74,7 +74,7 @@ class Particle:
 		self.pBestSelf = []
 		self.bestError = -1
 		self.currError = -1
-		self.keyLen = 5                                  # Change this to w/e you like.....
+		self.keyLen = 15                                  # Change this to w/e you like.....
 
 		# initialize a random position and random velocity
 		for i in range(0, self.keyLen):                  # iterate through the length of key.
@@ -159,7 +159,7 @@ class PSO():
 
 
 
-iterations = 100
+iterations = 200
 particle = 100
 bounds = [(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25),(0,25)]
 PSO(iterations, particle, bounds, fitnessFunc) 
