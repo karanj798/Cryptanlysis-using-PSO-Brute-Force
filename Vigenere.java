@@ -222,9 +222,7 @@ public class Vigenere {
             System.out.println("\nPlaintext: " + msg.toUpperCase() + "\n");
             System.out.println("Ciphertext: " + cipherTxt + "\n");
 
-            kasiski.map("spacemsg.txt", "spacekeymap.txt", key);
-            encrypt("spacemsg.txt", spaceCipher, "spacekeymap.txt", "cipher_space.txt");
-            // encrypt("spacemsg.txt", cipherTxt, "keymap.txt", "cipher_space.txt");
+            
 
         } else if (dore == 0) {
             System.out.println(
